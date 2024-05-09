@@ -7,7 +7,7 @@ function LoginPage({login}) {
     const [error, setError] = useState('')
 
     const handleLogin = () => {
-        axios.post('/login',{username, password})
+        axios.post('/login',{username, password}) //Flask service: 
         .then(response => {
             if (response.data.authenticated) {
                 login();
@@ -21,7 +21,14 @@ function LoginPage({login}) {
     }
   return (
     <div>
-        
+        <h2>Login</h2>
+        <label>Username:</label>
+        <input type="text" placeholder='username' value={username} onChange={(e) => setUsername(e.target.value)} />
+
+        <label>Password:</label>
+        <input type="text" placeholder='password' value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button onClick={handleLogin}>Login</button>
+        {error && <div>{error}</div>}
     </div>
   )
 }
