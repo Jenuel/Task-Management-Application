@@ -1,33 +1,41 @@
 from django.shortcuts import render
-from django.http import JsonResponse
 from rest_framework import generics, status
-from .serializers import serializers
+from .serializers import TaskSerializer
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Task
-
-import requests
 
 @api_view(['GET'])
 def allTask(request):
     tasks = Task.objects.all()
-    data = {'tasks': list(tasks.values())}
-    return JsonResponse(data)
+    serializer = TaskSerializer(tasks, many=True)
+    return Response(serializer.data, status=200)
 
 @api_view(['POST'])
 def add_task(request):
-    pass
+    serializer = TaskSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=401)
 
+#getting certain data for a certain task
 @api_view(['GET'])
-def read_task(request):
+def read_task(request, id):
 
     pass
 
 @api_view(['PUT'])
-def update_task(request, task_id):
-    # Handle PUT request to update an existing task
-    pass
+def update_task(request, id):
+    task = Task.objects.get(pk=id)
+    serializer = TaskSerializer(instance=task, data=request.data)
+    if serializer.is_valid:
+        serializer.save()
+        # return Response(serializer.data, status=)
+    return Response(serializer.errors, status=401)
 
 @api_view(['DELETE'])
-def delete_task(request, task_id):
-    # Handle DELETE request to delete a task
-    pass
+def delete_task(request, id):
+    task = Task.objects.get(pk=id)
+    task.delete()
+    return Response(204)
